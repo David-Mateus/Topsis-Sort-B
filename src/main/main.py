@@ -8,11 +8,20 @@ def main():
     st.title("Topsis-Sort-B")
 
     # Upload CSV file
-    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"]) # TODO: Validar
     dominant_profiles = np.array([[3, 1, 5]])
     domain_matrix = np.array([[1, 1, 1], [100, 100, 100]])
     weights = np.array([0.2, 0.2, 0.6])
 
+    values = st.slider(
+        'Matriz de Domínio',
+        1, 100, (25, 75))
+
+    st.write('Pesos')
+    weight_2 = st.slider(' ', 0.1, 1.0, 0.1)
+    weight_3 = st.slider(' ', 0.1, 1.0, 0.6)
+
+    print(values[0])
     if uploaded_file is not None:
         # Read the content of the uploaded file
         decision_matrix = pd.read_csv(uploaded_file, header=None).values
@@ -31,6 +40,7 @@ def main():
 
     else:
         st.warning("Please upload a CSV file.")
+
 
 if __name__ == "__main__":
     main()
