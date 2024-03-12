@@ -2,11 +2,17 @@ import numpy as np
 
 def dominant_profiles_distances(decision_matrix, domain_matrix, dominant_profiles, weights):
     dominant_profiles_normalized = np.zeros_like(dominant_profiles)
+    
     for i in range(dominant_profiles.shape[0]):
         for j in range(dominant_profiles.shape[1]):
-            dominant_profiles_normalized[i, j] = dominant_profiles[i, j] / domain_matrix[0, j]
-
+            # Evitar divisão por zero
+            if domain_matrix[0, j] != 0:
+                dominant_profiles_normalized[i, j] = dominant_profiles[i, j] / domain_matrix[0, j]
+            else:
+                dominant_profiles_normalized[i, j] = 0  # Ou escolha um valor adequado se domain_matrix[0, j] for zero
+    
     V_profiles = np.zeros_like(dominant_profiles_normalized)
+    
     for i in range(V_profiles.shape[0]):
         for j in range(V_profiles.shape[1]):
             V_profiles[i, j] = weights[j] * dominant_profiles_normalized[i, j]
@@ -17,6 +23,7 @@ def dominant_profiles_distances(decision_matrix, domain_matrix, dominant_profile
 
     d_plus_profiles = np.zeros(dominant_profiles.shape[0])
     d_minus_profiles = np.zeros(dominant_profiles.shape[0])
+    
     for k in range(dominant_profiles.shape[0]):
         d_plus_profiles[k] = np.sqrt(np.sum((V_profiles[k, :] - V_ideal_profiles)**2))
         d_minus_profiles[k] = np.sqrt(np.sum((V_profiles[k, :] - V_anti_ideal_profiles)**2))
@@ -27,4 +34,5 @@ def dominant_profiles_distances(decision_matrix, domain_matrix, dominant_profile
 
     # Dominant Profiles Approximation Coefficient Calculation
     Cl_profiles = d_minus_profiles / (d_plus_profiles + d_minus_profiles)
+    
     return Cl_profiles
