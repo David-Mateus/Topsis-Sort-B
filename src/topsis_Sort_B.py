@@ -1,91 +1,98 @@
 import numpy as np
 
-def vikor(X, P, D, w):
-    """
-    Função para implementar o método VIKOR com correções para divisão por zero e valores inválidos.
-
-    Argumentos:
-        X: Matriz de decisão (m x n).
-        P: Matriz de perfis dominantes (p x n).
-        D: Matriz de domínio (2 x n).
-        w: Vetor de pesos (n x 1).
-
-    Retorna:
-        Matriz de classificação (m x 2).
-    """
-
-    # Normalização da matriz de decisão
-    R = np.zeros_like(X)
-    for i in range(X.shape[0]):
-        for j in range(X.shape[1]):
-            R[i, j] = X[i, j] / D[0, j]
-
-    # Ponderação da matriz de decisão normalizada
+# Decision Matrix Normalization
+def decision_matrix_normalization(decision_matrix, domain_matrix, weights):
+    R = np.zeros_like(decision_matrix)
+    for i in range(decision_matrix.shape[0]):
+        for j in range(decision_matrix.shape[1]):
+            R[i, j] = decision_matrix[i, j] / domain_matrix[0, j]
     V = np.zeros_like(R)
     for i in range(V.shape[0]):
         for j in range(V.shape[1]):
-            V[i, j] = w[j] * R[i, j]
+            V[i, j] = weights[j] * R[i, j]
+    return V
 
-    # Cálculo das soluções ideal e anti-ideal
+def approximation_coefficient(decision_matrix, domain_matrix, weights):
+    V = decision_matrix_normalization(decision_matrix, domain_matrix, weights)
+    # Ideal and Anti-Ideal Solutions Calculation
     V_ideal = np.max(V, axis=0)
     V_anti_ideal = np.min(V, axis=0)
 
-    # Cálculo das distâncias euclidianas
-    d_plus = np.zeros(X.shape[0])
-    d_minus = np.zeros(X.shape[0])
-    for i in range(X.shape[0]):
+    # Euclidean Distances Calculation
+    d_plus = np.zeros(decision_matrix.shape[0])
+    d_minus = np.zeros(decision_matrix.shape[0])
+
+    for i in range(decision_matrix.shape[0]):
         d_plus[i] = np.sqrt(np.sum((V[i, :] - V_ideal)**2))
         d_minus[i] = np.sqrt(np.sum((V[i, :] - V_anti_ideal)**2))
 
-    # Corrigindo divisão por zero
+    # Avoiding division by zero
     d_plus[d_plus == 0] = np.finfo(float).eps
     d_minus[d_minus == 0] = np.finfo(float).eps
 
-    # Cálculo do coeficiente de aproximação
+    # Approximation Coefficient Calculation
     Cl = d_minus / (d_plus + d_minus)
+    return Cl
 
-    # Cálculo das distâncias dos perfis dominantes
-    d_plus_p = np.zeros(P.shape[0])
-    d_minus_p = np.zeros(P.shape[0])
-    for k in range(P.shape[0]):
-        d_plus_p[k] = np.sqrt(np.sum((P[k, :] - V_ideal)**2))
-        d_minus_p[k] = np.sqrt(np.sum((P[k, :] - V_anti_ideal)**2))
+def dominant_profiles_distances(decision_matrix, domain_matrix, dominant_profiles, weights):
+    dominant_profiles_normalized = np.zeros_like(dominant_profiles)
+    for i in range(dominant_profiles.shape[0]):
+        for j in range(dominant_profiles.shape[1]):
+            dominant_profiles_normalized[i, j] = dominant_profiles[i, j] / domain_matrix[0, j]
 
-    # Corrigindo divisão por zero
-    d_plus_p[d_plus_p == 0] = np.finfo(float).eps
-    d_minus_p[d_minus_p == 0] = np.finfo(float).eps
+    V_profiles = np.zeros_like(dominant_profiles_normalized)
+    for i in range(V_profiles.shape[0]):
+        for j in range(V_profiles.shape[1]):
+            V_profiles[i, j] = weights[j] * dominant_profiles_normalized[i, j]
 
-    # Cálculo do coeficiente de aproximação dos perfis dominantes
-    Cl_p = d_minus_p / (d_plus_p + d_minus_p)
+    # Dominant Profiles Distances Calculation
+    V_ideal_profiles = np.max(V_profiles, axis=0)
+    V_anti_ideal_profiles = np.min(V_profiles, axis=0)
 
-    # Classificação das alternativas e perfis
-    C = np.zeros((X.shape[0], 2))
-    for i in range(X.shape[0]):
-        if Cl[i] >= Cl_p[0]:
+    d_plus_profiles = np.zeros(dominant_profiles.shape[0])
+    d_minus_profiles = np.zeros(dominant_profiles.shape[0])
+    for k in range(dominant_profiles.shape[0]):
+        d_plus_profiles[k] = np.sqrt(np.sum((V_profiles[k, :] - V_ideal_profiles)**2))
+        d_minus_profiles[k] = np.sqrt(np.sum((V_profiles[k, :] - V_anti_ideal_profiles)**2))
+
+    # Avoiding division by zero
+    d_plus_profiles[d_plus_profiles == 0] = np.finfo(float).eps
+    d_minus_profiles[d_minus_profiles == 0] = np.finfo(float).eps
+
+    # Dominant Profiles Approximation Coefficient Calculation
+    Cl_profiles = d_minus_profiles / (d_plus_profiles + d_minus_profiles)
+    return Cl_profiles
+
+def topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominant_profiles, weights):
+    Cl = approximation_coefficient(decision_matrix, domain_matrix, weights)
+    Cl_profiles = dominant_profiles_distances(decision_matrix, domain_matrix, dominant_profiles, weights)
+    
+    C = np.zeros((decision_matrix.shape[0], 2))
+    for i in range(decision_matrix.shape[0]):
+        if Cl[i] >= Cl_profiles[0]:
             C[i, 0] = 1
         else:
-            for k in range(1, P.shape[0]):
-                if Cl_p[k-1] > Cl[i] >= Cl_p[k]:
+            for k in range(1, dominant_profiles.shape[0]):
+                if Cl_profiles[k-1] > Cl[i] >= Cl_profiles[k]:
                     C[i, 0] = k + 1
                     break
         C[i, 1] = Cl[i]
 
-    return C
+    best_solution_index = np.argmax(C[:, 1])  # Index of the row with the highest approximation coefficient
+    best_solution = decision_matrix[best_solution_index]  # Best solution
+    best_profile = int(C[best_solution_index, 0])  # Dominant profile of the best solution
 
-# Exemplo de uso
-X = np.array([[5, 8, 7], [7, 6, 9], [9, 4, 8], [8, 7, 9]])
-P = np.array([[3, 9, 10], [10, 5, 8]])
-D = np.array([[3, 10, 10], [1, 5, 8]])
-w = np.array([0.4, 0.3, 0.3])
+    return C, best_solution, best_profile
 
+# Example
+decision_matrix = np.array([[3, 8, 5], [9, 4, 1], [5, 2, 10], [10, 5, 2]])
+dominant_profiles = np.array([[3, 7, 5]])
+domain_matrix = np.array([[1, 1, 1], [100, 100, 100]])
+weights = np.array([0.2, 0.2, 0.6])
+classification_result, best_solution, best_profile = topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominant_profiles, weights)
 
-C = vikor(X, P, D, w)
-
-print(C)
-# Encontrando a melhor solução
-best_solution_index = np.argmax(C[:, 1])  # Índice da linha com o maior coeficiente de aproximação
-best_solution = X[best_solution_index]  # Melhor solução
-best_profile = int(C[best_solution_index, 0])  # Perfil dominante da melhor solução
-
-print("Melhor solução:", best_solution)
-print("Perfil dominante da melhor solução:", best_profile)
+print("Classification Result:")
+print(classification_result)
+print("Best Solution:")
+print(best_solution)
+print("Dominant Profile of the Best Solution:", best_profile)
