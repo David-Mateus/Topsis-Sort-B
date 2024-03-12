@@ -5,12 +5,14 @@ def decision_matrix_normalization(decision_matrix, domain_matrix, weights):
     R = np.zeros_like(decision_matrix)
     for i in range(decision_matrix.shape[0]):
         for j in range(decision_matrix.shape[1]):
-            R[i, j] = decision_matrix[i, j] / domain_matrix[0, j]
+            # Avoiding division by zero
+            R[i, j] = decision_matrix[i, j] / max(domain_matrix[0, j], np.finfo(float).eps)
     V = np.zeros_like(R)
     for i in range(V.shape[0]):
         for j in range(V.shape[1]):
             V[i, j] = weights[j] * R[i, j]
     return V
+
 
 def approximation_coefficient(decision_matrix, domain_matrix, weights):
     V = decision_matrix_normalization(decision_matrix, domain_matrix, weights)
@@ -78,15 +80,20 @@ def topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominan
                     break
         C[i, 1] = Cl[i]
 
-    best_solution_index = np.argmax(C[:, 1])  # Index of the row with the highest approximation coefficient
-    best_solution = decision_matrix[best_solution_index]  # Best solution
-    best_profile = int(C[best_solution_index, 0])  # Dominant profile of the best solution
+    best_solution_index = np.argmax(C[:, 1])  
+    best_solution = decision_matrix[best_solution_index] 
+    best_profile = int(C[best_solution_index, 0])  
 
     return C, best_solution, best_profile
 
-# Example
-decision_matrix = np.array([[3, 8, 5], [9, 4, 1], [5, 2, 10], [10, 5, 2]])
-dominant_profiles = np.array([[3, 7, 5]])
+# Leitura dos dados do arquivo
+data = np.loadtxt('./advertising.csv', delimiter=',', skiprows=1)
+
+# Matriz de decisão (excluindo a última coluna que representa as vendas)
+decision_matrix = data[:, :-1]
+
+decision_matrix = np.array(decision_matrix)
+dominant_profiles = np.array([[0.3, 0.1, 5]])
 domain_matrix = np.array([[1, 1, 1], [100, 100, 100]])
 weights = np.array([0.2, 0.2, 0.6])
 classification_result, best_solution, best_profile = topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominant_profiles, weights)
