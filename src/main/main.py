@@ -15,7 +15,9 @@ def main():
 
     if uploaded_file is not None:
         # Read the content of the uploaded file
-        decision_matrix = pd.read_csv(uploaded_file, header=None).values
+        data = np.loadtxt(uploaded_file, delimiter=',', skiprows=1)
+# Matriz de decisão (excluindo a última coluna que representa as vendas)
+        decision_matrix = data[:, :-1]
 
         # Run the TOPSIS analysis
         classification_result, best_solution, best_profile = topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominant_profiles, weights)
@@ -25,7 +27,7 @@ def main():
         st.table(pd.DataFrame(classification_result, columns=["Dominant Profile", "Approximation Coefficient"]))
 
         st.write("Best Solution:")
-        st.table(pd.DataFrame(best_solution, columns=[f"Feature {i}" for i in range(1, len(best_solution)+1)]))
+        st.table(pd.DataFrame(best_solution, columns=[f"Feature: " ]))
 
         st.write("Dominant Profile of the Best Solution:", best_profile)
 
