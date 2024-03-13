@@ -8,10 +8,32 @@ def main():
     st.title("Topsis-Sort-B")
 
     # Upload CSV file
-    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
-    dominant_profiles = np.array([[3, 1, 5]])
-    domain_matrix = np.array([[1, 1, 1], [100, 100, 100]])
-    weights = np.array([0.2, 0.2, 0.6])
+    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"]) # TODO: Validar
+
+    st.write('Perfil dominante')
+    # [[3, 1, 5]]
+    container = st.container()
+
+    # Cria as colunas
+    col1, col2, col3 = container.columns(3)
+
+    # Cria os inputs dentro das colunas
+    num1 = col1.number_input("Primeiro número", min_value=1, max_value=10, step=1, key="num1")
+    num2 = col2.number_input("Segundo número", min_value=1, max_value=10, step=1, key="num2")
+    num3 = col3.number_input("Terceiro número", min_value=1, max_value=10, step=1, key="num3")
+
+    values = st.slider(
+        'Matriz de Domínio',
+        1, 100, (25, 75))
+
+    st.write('Pesos')
+    weight_1 = st.slider(' ', 0.1, 1.0, 0.1)
+    weight_2 = st.slider('  ', 0.1, 1.0, 0.1)
+    weight_3 = st.slider('   ', 0.1, 1.0, 0.6)
+
+    dominant_profiles = np.array([[num1, num2, num3]])
+    domain_matrix = np.array([[values[0], values[0], values[0]], [values[1], values[1], values[1]]])
+    weights = np.array([weight_1, weight_2, weight_3])
 
     if uploaded_file is not None:
         # Read the content of the uploaded file
@@ -33,6 +55,7 @@ def main():
 
     else:
         st.warning("Please upload a CSV file.")
+
 
 if __name__ == "__main__":
     main()
