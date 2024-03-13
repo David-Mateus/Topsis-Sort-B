@@ -1,4 +1,4 @@
-from .src.main.topsis_sort_b import topsis_b_sort_profile_classification
+from topsis_sort_b import topsis_b_sort_profile_classification
 import pandas as pd
 import streamlit as st
 import numpy as np
@@ -22,10 +22,11 @@ def main():
 
     st.write('Pesos')
     weight_1 = st.slider(' ', 0.1, 1.0, 0.1)
-    weight_2 = st.slider(' ', 0.1, 1.0, 0.1)
-    weight_3 = st.slider(' ', 0.1, 1.0, 0.6)
+    weight_2 = st.slider('  ', 0.1, 1.0, 0.1)
+    weight_3 = st.slider('   ', 0.1, 1.0, 0.6)
 
     print(values[0])
+
     if uploaded_file is not None:
         # Read the content of the uploaded file
         data = np.loadtxt(uploaded_file, delimiter=',', skiprows=1)
