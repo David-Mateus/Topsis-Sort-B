@@ -9,12 +9,18 @@ def main():
 
     # Upload CSV file
     uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"]) # TODO: Validar
-    dominant_profiles = np.array([[3, 1, 5]])
-    domain_matrix = np.array([[1, 1, 1], [100, 100, 100]])
-    weights = np.array([0.2, 0.2, 0.6])
 
     st.write('Perfil dominante')
     # [[3, 1, 5]]
+    container = st.container()
+
+    # Cria as colunas
+    col1, col2, col3 = container.columns(3)
+
+    # Cria os inputs dentro das colunas
+    num1 = col1.number_input("Primeiro número", min_value=1, max_value=10, step=1, key="num1")
+    num2 = col2.number_input("Segundo número", min_value=1, max_value=10, step=1, key="num2")
+    num3 = col3.number_input("Terceiro número", min_value=1, max_value=10, step=1, key="num3")
 
     values = st.slider(
         'Matriz de Domínio',
@@ -25,7 +31,9 @@ def main():
     weight_2 = st.slider('  ', 0.1, 1.0, 0.1)
     weight_3 = st.slider('   ', 0.1, 1.0, 0.6)
 
-    print(values[0])
+    dominant_profiles = np.array([[num1, num2, num3]])
+    domain_matrix = np.array([[values[0], values[0], values[0]], [values[1], values[1], values[1]]])
+    weights = np.array([weight_1, weight_2, weight_3])
 
     if uploaded_file is not None:
         # Read the content of the uploaded file
