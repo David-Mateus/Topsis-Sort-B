@@ -1,4 +1,4 @@
-from topsis_sort_b import topsis_b_sort_profile_classification
+from .src.main.topsis_sort_b import topsis_b_sort_profile_classification
 import pandas as pd
 import streamlit as st
 import numpy as np
