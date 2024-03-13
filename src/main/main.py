@@ -16,7 +16,7 @@ def main():
     if uploaded_file is not None:
         # Read the content of the uploaded file
         data = np.loadtxt(uploaded_file, delimiter=',', skiprows=1)
-# Matriz de decisão (excluindo a última coluna que representa as vendas)
+        # Matriz de decisão (excluindo a última coluna que representa as vendas)
         decision_matrix = data[:, :-1]
 
         # Run the TOPSIS analysis

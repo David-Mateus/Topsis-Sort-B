@@ -88,7 +88,6 @@ def topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominan
 
 # Leitura dos dados do arquivo
 data = np.loadtxt('./advertising.csv', delimiter=',', skiprows=1)
-
 # Matriz de decisão (excluindo a última coluna que representa as vendas)
 decision_matrix = data[:, :-1]
 
