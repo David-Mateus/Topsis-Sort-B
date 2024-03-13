@@ -13,11 +13,15 @@ def main():
     domain_matrix = np.array([[1, 1, 1], [100, 100, 100]])
     weights = np.array([0.2, 0.2, 0.6])
 
+    st.write('Perfil dominante')
+    # [[3, 1, 5]]
+
     values = st.slider(
         'Matriz de Domínio',
         1, 100, (25, 75))
 
     st.write('Pesos')
+    weight_1 = st.slider(' ', 0.1, 1.0, 0.1)
     weight_2 = st.slider(' ', 0.1, 1.0, 0.1)
     weight_3 = st.slider(' ', 0.1, 1.0, 0.6)
 
