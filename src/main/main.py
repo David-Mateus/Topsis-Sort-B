@@ -1,8 +1,7 @@
-from topsis_sort_b import topsis_b_sort_profile_classification
-import pandas as pd
 import streamlit as st
+import pandas as pd
 import numpy as np
-import re
+from topsis_sort_b import topsis_b_sort_profile_classification
 
 def main():
     st.title("Topsis-Sort-B")
@@ -10,90 +9,60 @@ def main():
     # Upload CSV file
     uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"]) # TODO: Validar
 
-    st.write('Perfil dominante')
-    # [[3, 1, 5]]
-    container = st.container()
-
-    # Cria as colunas
-    col1, col2, col3 = container.columns(3)
-
-    # Cria os inputs dentro das colunas
-    num1 = col1.number_input("Primeiro número", min_value=1, max_value=10, step=1, key="num1")
-    num2 = col2.number_input("Segundo número", min_value=1, max_value=10, step=1, key="num2")
-    num3 = col3.number_input("Terceiro número", min_value=1, max_value=10, step=1, key="num3")
-
-    values = st.slider(
-        'Matriz de Domínio',
-        1, 100, (25, 75))
-
-    st.write('Pesos')
-    weight_1 = st.slider(' ', 0.1, 1.0, 0.1)
-    weight_2 = st.slider('  ', 0.1, 1.0, 0.1)
-    weight_3 = st.slider('   ', 0.1, 1.0, 0.6)
-
-    dominant_profiles = np.array([[num1, num2, num3]])
-    domain_matrix = np.array([[values[0], values[0], values[0]], [values[1], values[1], values[1]]])
-    weights = np.array([weight_1, weight_2, weight_3])
-
     if uploaded_file is not None:
         # Read the content of the uploaded file
         data = np.loadtxt(uploaded_file, delimiter=',', skiprows=1)
-        # Matriz de decisão (excluindo a última coluna que representa as vendas)
-        decision_matrix = data[:, :-1]
+        # Matriz de decisão 
+        decision_matrix = data[:, 0:]
+        num_columns = decision_matrix.shape[1]
+        st.write('Perfil dominante')
+        container = st.container()
+        
+        # Dicionário para armazenar os valores dos inputs
+        inputs = {}
 
-        # Run the TOPSIS analysis
-        classification_result, best_solution, best_profile = topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominant_profiles, weights)
+        # Cria os inputs dentro das colunas
+        for i in range(num_columns):
+            input_name = f"num{i + 1}"
+            valor = st.number_input(f"Digite o número {i + 1}:", min_value=1, max_value=10, step=1, key=input_name)
+            inputs[input_name] = valor
 
-        # Display the results
-        st.write("Classification Result:")
-        st.table(pd.DataFrame(classification_result, columns=["Dominant Profile", "Approximation Coefficient"]))
+        num_values = st.slider('Número de valores na Matriz de Domínio:', 1, num_columns, num_columns)
+        values = []
+        for i in range(num_values):
+            value = st.slider(f'Valor {i+1}', 1, 100, 50)
+            values.append(value)
+        values = np.array(values)
 
-        st.write("Best Solution:")
-        st.table(pd.DataFrame(best_solution, columns=[f"Feature: " ]))
+        num_pesos = st.slider('Número de pesos:', 1, num_columns, num_columns)
+        weights = []
+        for i in range(num_pesos):
+            peso = st.slider(f'Peso {i+1}', 0.1, 1.0, 0.1)
+            weights.append(peso)
+        weights = np.array(weights)
 
-        st.write("Dominant Profile of the Best Solution:", best_profile)
+        dominant_profiles = np.array([[inputs[f"num{i+1}"] for i in range(num_columns)]])
+        domain_matrix = np.array([values for _ in range(2)])
+
+        if st.button("Visualizar Resultados"):
+            classification_result, best_solution, best_profile = topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominant_profiles, weights)
+        
+            indices_sorted = np.argsort(classification_result[:, 1])[::-1]
+            indices_top_10 = indices_sorted[:5]
+            classification_result_sorted = classification_result[indices_top_10]
+            df_classification_result = pd.DataFrame(classification_result_sorted, columns=["Dominant Profile", "Approximation Coefficient"])
+            
+            st.write("Classification Result:")
+            st.table(df_classification_result)
+            
+            df_best_solution = pd.DataFrame([best_solution], columns=[f"Feature: {i}" for i in range(len(best_solution))])
+            st.write("Best Solution:")
+            st.table(df_best_solution.to_dict(orient='records'))
+
+            st.write("Dominant Profile of the Best Solution:", best_profile)
 
     else:
         st.warning("Please upload a CSV file.")
 
-
 if __name__ == "__main__":
     main()
-
-# def main():
-#     st.title("Topsis-Sort-B")
-
-#     # Fazer upload do arquivo CSV
-#     uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
-#     dominant_profiles = st.text_area("Dominant Profiles (comma-separated values): ")
-#     domain_matrix = st.text_area("Domain Matrix (comma-separated values, one row per line): ")
-#     weights = st.text_area("Weights (comma-separated values): ")
-
-#     if st.button("Run Analysis"):
-#         try:
-#             if uploaded_file:
-#                 decision_matrix = pd.read_csv(uploaded_file, header=None).values
-#             else:
-#                 decision_matrix = np.array([list(map(int, row.split(','))) for row in uploaded_file.split('\n')])
-            
-#             dominant_profiles = np.array([list(map(int, re.split(r'[,\s]+', dominant_profiles.strip())))])
-#             domain_matrix = np.array([list(map(int, row.split(','))) for row in domain_matrix.split('\n')])
-#             weights = np.array(list(map(float, weights.split(','))))
-
-#             # Executa a análise TOPSIS
-#             classification_result, best_solution, best_profile = topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominant_profiles, weights)
-
-#             # Exibe os resultados
-#             st.write("Classification Result:")
-#             st.table(pd.DataFrame(classification_result, columns=["Dominant Profile", "Approximation Coefficient"]))
-
-#             st.write("Best Solution:")
-#             st.table(pd.DataFrame(best_solution, columns=[f"Feature {i}" for i in range(1, len(best_solution)+1)]))
-
-#             st.write("Dominant Profile of the Best Solution:", best_profile)
-        
-#         except Exception as e:
-#             st.error(f"An error occurred: {str(e)}")
-
-# if __name__ == "__main__":
-#     main()
