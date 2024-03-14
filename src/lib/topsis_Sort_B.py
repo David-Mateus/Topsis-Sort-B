@@ -80,21 +80,24 @@ def topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominan
                     break
         C[i, 1] = Cl[i]
 
-    best_solution_index = np.argmax(C[:, 1])  
+    sorted_indices = np.argsort(-C[:, 1])  # Ordena os índices em ordem decrescente com base nos valores de Cl
+    C_sorted = C[sorted_indices]
+    
+    best_solution_index = sorted_indices[0]  # Índice do melhor valor após a ordenação
     best_solution = decision_matrix[best_solution_index] 
-    best_profile = int(C[best_solution_index, 0])  
+    best_profile = int(C_sorted[0, 0])  
 
-    return C, best_solution, best_profile
+    return C_sorted, best_solution, best_profile
 
 # Leitura dos dados do arquivo
 data = np.loadtxt('./advertising.csv', delimiter=',', skiprows=1)
 # Matriz de decisão (excluindo a última coluna que representa as vendas)
-decision_matrix = data[:, :-1]
+decision_matrix = data[:, :]
 
 decision_matrix = np.array(decision_matrix)
 dominant_profiles = np.array([[0.3, 0.1, 5]])
-domain_matrix = np.array([[1, 1, 1], [100, 100, 100]])
-weights = np.array([0.2, 0.2, 0.6])
+domain_matrix = np.array([[1, 1, 1, 1], [100, 100, 100, 100]])
+weights = np.array([0.2, 0.2, 0.4, 0.2])
 classification_result, best_solution, best_profile = topsis_b_sort_profile_classification(decision_matrix, domain_matrix, dominant_profiles, weights)
 
 print("Classification Result:")
