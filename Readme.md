@@ -1,6 +1,6 @@
 # Topsis Sort B
-## O que é o TOPSIS-Sort-B
-#### O TOPSIS-Sort-B é uma variação aprimorada do método TOPSIS-Sort, desenvolvido para lidar com problemas de classificação e ordenação de alternativas em múltiplos critérios. Neste método, são utilizados perfis de fronteira para determinar as classes de categorização e realizar a ordenação das alternativas de acordo com a proximidade de seus coeficientes de proximidade em relação aos perfis estabelecidos.
+
+ The TOPSIS-Sort-B is an enhanced variation of the TOPSIS-Sort method, designed to address classification and sorting problems in multiple criteria decision-making. In this method, boundary profiles are employed to determine categorization classes and to sort alternatives based on the proximity of their proximity coefficients to the established profiles.
 
 ## Tecnologias usads
 | Tecnologias | Versão  | Install                               |
@@ -25,17 +25,22 @@
 
 1. **Upload Your CSV File:**
    - You'll see a screen to upload your CSV file containing the required data.
-
 2. **Select the Dominant Profile:**
    - After uploading the file, you'll be prompted to select the relevant dominant profile for analysis.
-
 3. **Specify the Number of Values in the Domain Matrix:**
    - You'll need to input the desired number of values to compose the domain matrix.
-
 4. **Provide the Number of Weights:**
    - Next, you'll be asked to input the number of weights needed for analysis.
-
 5. **Assign Weights to Dominant Profiles:**
    - You'll be prompted to assign a weight to each selected dominant profile.
-
 After completing these steps, the system will be ready to process and analyze the data according to your specifications.
+
+## References
+
+- Silva, D. F. L., & Filho, A. T. A. (2020). Sorting with TOPSIS through boundary and characteristic profiles. Journal Name, Volume(1), 141.
+- GeeksforGeeks.TOPSIS method for Multiple-Criteria Decision Making (MCDM). Retrieved from [[URL](https://www.geeksforgeeks.org/topsis-method-for-multiple-criteria-decision-making-mcdm/)]
+
+## Deploy
+- Aplicação
+- library
+
