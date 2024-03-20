@@ -12,6 +12,11 @@ def main():
     if uploaded_file is not None:
         # Read the content of the uploaded file
         data = np.loadtxt(uploaded_file, delimiter=',', skiprows=1)
+        uploaded_file.seek(0)
+        first_line = uploaded_file.readline().decode().strip()
+
+    # Dividir os nomes das colunas usando a vírgula como delimitador
+        column_names = first_line.split(',')
         # Matriz de decisão 
         decision_matrix = data[:, 0:]
         num_columns = decision_matrix.shape[1]
@@ -55,7 +60,7 @@ def main():
             st.write("Classification Result:")
             st.table(df_classification_result)
             
-            df_best_solution = pd.DataFrame([best_solution], columns=[f"Feature: {i}" for i in range(len(best_solution))])
+            df_best_solution = pd.DataFrame([best_solution], columns=[f"{column_names[i]}: {i}" for i in range(len(best_solution))])
             st.write("Best Solution:")
             st.table(df_best_solution.to_dict(orient='records'))
 

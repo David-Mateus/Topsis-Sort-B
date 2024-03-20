@@ -42,5 +42,5 @@ After completing these steps, the system will be ready to process and analyze th
 
 ## Deploy
 - Aplicação
-- library
+- library [[URL](https://pypi.org/project/topsisSortLib/)]
 
