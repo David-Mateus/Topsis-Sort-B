@@ -32,16 +32,16 @@ def main():
             valor = st.number_input(f"Digite o número {i + 1}:", min_value=1, max_value=10, step=1, key=input_name)
             inputs[input_name] = valor
 
-        num_values = st.slider('Número de valores na Matriz de Domínio:', 1, num_columns, num_columns)
+        st.write(f'Número de valores na Matriz de Domínio: {num_columns}')
         values = []
-        for i in range(num_values):
+        for i in range(num_columns):
             value = st.slider(f'Valor {i+1}', 1, 100, 50)
             values.append(value)
         values = np.array(values)
 
-        num_pesos = st.slider('Número de pesos:', 1, num_columns, num_columns)
+        st.write(f'Número de pesos: {num_columns}')
         weights = []
-        for i in range(num_pesos):
+        for i in range(num_columns):
             peso = st.slider(f'Peso {i+1}', 0.1, 1.0, 0.1)
             weights.append(peso)
         weights = np.array(weights)
